@@ -1,2 +1,2 @@
 # Sprinkler
-Tool which links PR to Spigot together
+Tool which links PR from Spigot together
