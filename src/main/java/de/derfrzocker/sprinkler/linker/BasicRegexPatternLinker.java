@@ -2,7 +2,6 @@ package de.derfrzocker.sprinkler.linker;
 
 import de.derfrzocker.sprinkler.data.PullRequestInfo;
 import de.derfrzocker.sprinkler.data.Repository;
-
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;

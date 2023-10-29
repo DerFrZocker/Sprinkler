@@ -12,8 +12,6 @@ import de.derfrzocker.sprinkler.data.handler.NewCommit;
 import de.derfrzocker.sprinkler.data.handler.NewPullRequest;
 import de.derfrzocker.sprinkler.data.handler.StatusUpdate;
 import de.derfrzocker.sprinkler.handler.PullRequestHandler;
-
-import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
 
@@ -32,7 +30,7 @@ public class PullRequestService implements PullRequestHandler {
     @Override
     public void handleNewPullRequest(NewPullRequest newPullRequest) {
         PullRequestInfo pullRequestInfo = new PullRequestInfo(newPullRequest.repository(), newPullRequest.id());
-        PullRequest pullRequest = new PullRequest(pullRequestInfo, Instant.now(), newPullRequest.authorId());
+        PullRequest pullRequest = new PullRequest(pullRequestInfo, newPullRequest.creationTime(), newPullRequest.authorId());
         pullRequest.setStatus(Status.OPENED);
         pullRequest.setTitle(newPullRequest.title());
         pullRequest.setBranch(newPullRequest.branch());
@@ -78,8 +76,10 @@ public class PullRequestService implements PullRequestHandler {
 
         if (pullRequest.isEmpty()) {
             // Probably an old PR ignore
+            return;
         }
 
+        linkService.searchAndCreateLink(editeComment.authorId(), pullRequest.get(), editeComment.message());
     }
 
     @Override

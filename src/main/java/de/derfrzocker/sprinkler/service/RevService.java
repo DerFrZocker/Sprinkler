@@ -5,7 +5,6 @@ import de.derfrzocker.sprinkler.dao.RevDao;
 import de.derfrzocker.sprinkler.data.Commit;
 import de.derfrzocker.sprinkler.data.PullRequest;
 import de.derfrzocker.sprinkler.data.Rev;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;

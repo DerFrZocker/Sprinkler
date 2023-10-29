@@ -5,11 +5,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import de.derfrzocker.sprinkler.data.Repository;
 import de.derfrzocker.sprinkler.data.Rev;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -22,6 +17,10 @@ import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 public class HttpRevDao implements RevDao {
 

@@ -3,7 +3,6 @@ package de.derfrzocker.sprinkler.dao;
 import com.google.gson.Gson;
 import de.derfrzocker.sprinkler.data.Commit;
 import de.derfrzocker.sprinkler.data.PullRequestInfo;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;

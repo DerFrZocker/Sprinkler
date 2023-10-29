@@ -1,7 +1,8 @@
 package de.derfrzocker.sprinkler.data.handler;
 
 import de.derfrzocker.sprinkler.data.Repository;
+import java.time.Instant;
 
 public record NewPullRequest(Repository repository, int id, String authorId, String title, String message,
-                             String branch) {
+                             String branch, Instant creationTime) {
 }

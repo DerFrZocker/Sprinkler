@@ -3,7 +3,6 @@ package de.derfrzocker.sprinkler.dao;
 import de.derfrzocker.sprinkler.data.PullRequest;
 import de.derfrzocker.sprinkler.data.PullRequestInfo;
 import de.derfrzocker.sprinkler.data.Repository;
-
 import java.util.Optional;
 import java.util.stream.Stream;
 

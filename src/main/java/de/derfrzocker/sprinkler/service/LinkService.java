@@ -7,11 +7,9 @@ import de.derfrzocker.sprinkler.data.PullRequestInfo;
 import de.derfrzocker.sprinkler.data.PullRequestLink;
 import de.derfrzocker.sprinkler.data.Repository;
 import de.derfrzocker.sprinkler.linker.Linker;
-
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -23,7 +21,7 @@ import java.util.stream.Collectors;
 
 public class LinkService {
 
-    private static final String SPECIAL_PREFIX = "Link";
+    private static final String SPECIAL_PREFIX = "!Link: ";
     private static final Duration CREATE_WINDOW = Duration.ofHours(4);
 
     private final Set<String> specialLinker;
@@ -41,17 +39,36 @@ public class LinkService {
     public void searchAndCreateLink(String requester, PullRequest pullRequest, String message) {
         Set<PullRequestInfo> links = searchForLink(requester, pullRequest, message);
 
-        if (links.isEmpty()) {
+        links.add(pullRequest.getInfo()); // Add self to link
+
+        Set<PullRequestLink> existingLinks = links
+                .stream()
+                .map(linkerDao::get)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toSet());
+
+        PullRequestLink link = new PullRequestLink(links);
+
+        if (existingLinks.isEmpty()) {
+            linkerDao.create(link);
             return;
         }
 
-        PullRequestLink link = new PullRequestLink(-1, links);
+        if (existingLinks.contains(link)) {
+            if (existingLinks.size() == 1) {
+                return;
+            }
+            // TODO: 10/27/23 Log inconsistency, this should not happen
+        }
+
+        existingLinks.forEach(linkerDao::remove);
 
         linkerDao.create(link);
     }
 
     public void removeLinks(PullRequestInfo pullRequestInfo) {
-        linkerDao.getAll(pullRequestInfo).forEach(link -> linkerDao.remove(link.linkId()));
+        linkerDao.get(pullRequestInfo).ifPresent(linkerDao::remove);
     }
 
     private Set<PullRequestInfo> searchForLink(String requester, PullRequest pullRequest, String message) {
@@ -75,6 +92,7 @@ public class LinkService {
                     .map(pullRequestDao::get)
                     .filter(Optional::isPresent)
                     .map(Optional::get)
+                    .filter(found -> filterAuthor(pullRequest, found))
                     .filter(found -> filterDate(pullRequest, found))
                     .filter(found -> filterRev(pullRequest, found))
                     .map(PullRequest::getInfo)
@@ -94,31 +112,34 @@ public class LinkService {
             }
         }
 
-        Map<Repository, Integer> result = links.stream().map(PullRequestInfo::repository).collect(Collectors.groupingBy(Function.identity(), new Collector<Repository, Holder, Integer>() {
-            public Supplier<Holder> supplier() {
-                return Holder::new;
-            }
+        Map<Repository, Integer> result = links
+                .stream()
+                .map(PullRequestInfo::repository)
+                .collect(Collectors.groupingBy(Function.identity(), new Collector<Repository, Holder, Integer>() {
+                    public Supplier<Holder> supplier() {
+                        return Holder::new;
+                    }
 
-            @Override
-            public BiConsumer<Holder, Repository> accumulator() {
-                return (holder, repository) -> holder.amount++;
-            }
+                    @Override
+                    public BiConsumer<Holder, Repository> accumulator() {
+                        return (holder, repository) -> holder.amount++;
+                    }
 
-            @Override
-            public BinaryOperator<Holder> combiner() {
-                return (f, s) -> new Holder(f.amount + s.amount);
-            }
+                    @Override
+                    public BinaryOperator<Holder> combiner() {
+                        return (f, s) -> new Holder(f.amount + s.amount);
+                    }
 
-            @Override
-            public Function<Holder, Integer> finisher() {
-                return holder -> holder.amount;
-            }
+                    @Override
+                    public Function<Holder, Integer> finisher() {
+                        return holder -> holder.amount;
+                    }
 
-            @Override
-            public Set<Characteristics> characteristics() {
-                return Collections.emptySet();
-            }
-        }));
+                    @Override
+                    public Set<Characteristics> characteristics() {
+                        return Collections.emptySet();
+                    }
+                }));
 
         for (Map.Entry<Repository, Integer> entry : result.entrySet()) {
             if (entry.getValue() > 1) {
@@ -131,10 +152,14 @@ public class LinkService {
     }
 
     private boolean filterDate(PullRequest newPullRequest, PullRequest foundPullRequest) {
-        return newPullRequest.getCreateDate().minus(CREATE_WINDOW).isBefore(foundPullRequest.getCreateDate());
+        return CREATE_WINDOW.compareTo(Duration.between(newPullRequest.getCreateDate(), foundPullRequest.getCreateDate()).abs()) >= 0;
     }
 
     private boolean filterRev(PullRequest newPullRequest, PullRequest foundPullRequest) {
-        return Objects.equals(newPullRequest.getRev(), foundPullRequest.getRev());
+        return !Collections.disjoint(newPullRequest.getRev(), foundPullRequest.getRev());
+    }
+
+    private boolean filterAuthor(PullRequest newPullRequest, PullRequest foundPullRequest) {
+        return newPullRequest.getAuthorId().equals(foundPullRequest.getAuthorId());
     }
 }
