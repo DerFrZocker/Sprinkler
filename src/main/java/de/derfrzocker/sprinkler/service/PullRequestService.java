@@ -7,6 +7,7 @@ import de.derfrzocker.sprinkler.data.Rev;
 import de.derfrzocker.sprinkler.data.Status;
 import de.derfrzocker.sprinkler.data.handler.DeletePullRequest;
 import de.derfrzocker.sprinkler.data.handler.EditeComment;
+import de.derfrzocker.sprinkler.data.handler.ModifiedPullRequest;
 import de.derfrzocker.sprinkler.data.handler.NewComment;
 import de.derfrzocker.sprinkler.data.handler.NewCommit;
 import de.derfrzocker.sprinkler.data.handler.NewPullRequest;
@@ -39,6 +40,28 @@ public class PullRequestService implements PullRequestHandler {
         linkService.searchAndCreateLink(pullRequest.getAuthorId(), pullRequest, newPullRequest.message());
 
         requestDao.create(pullRequest);
+    }
+
+    @Override
+    public void handleModifiedPullRequest(ModifiedPullRequest modifiedPullRequest) {
+        PullRequestInfo pullRequestInfo = new PullRequestInfo(modifiedPullRequest.repository(), modifiedPullRequest.id());
+        Optional<PullRequest> pullRequest = requestDao.get(pullRequestInfo);
+
+        if (pullRequest.isEmpty()) {
+            // Probably an old PR ignore
+            return;
+        }
+
+        boolean modified = false;
+
+        if (!modifiedPullRequest.title().equals(pullRequest.get().getTitle())) {
+            pullRequest.get().setTitle(modifiedPullRequest.title());
+            modified = true;
+        }
+
+        if (modified) {
+            requestDao.update(pullRequest.get());
+        }
     }
 
     @Override

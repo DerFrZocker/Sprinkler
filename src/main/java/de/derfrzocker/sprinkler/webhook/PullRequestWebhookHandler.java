@@ -3,6 +3,7 @@ package de.derfrzocker.sprinkler.webhook;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import de.derfrzocker.sprinkler.data.PullRequest;
 import de.derfrzocker.sprinkler.data.handler.NewPullRequest;
 import de.derfrzocker.sprinkler.handler.PullRequestHandler;
 import java.io.IOException;
@@ -27,26 +28,35 @@ public class PullRequestWebhookHandler implements HttpHandler {
             return;
         }
 
+        // TODO: 10/30/23 Add auth check 
+
         switch (request) {
             case "pr:opened":
                 handleOpened(gson.fromJson(new InputStreamReader(exchange.getRequestBody()), PullRequestOpened.class));
                 break;
+            case "pr:from_ref_updated payload":
+                handleSourceUpdate(gson.fromJson(new InputStreamReader(exchange.getRequestBody()), PullRequestSourceUpdate.class));
+                break;
             case "pr:modified":
-                handleModified();
+                handleModified(gson.fromJson(new InputStreamReader(exchange.getRequestBody()), PullRequestModified.class));
+                break;
+            case "pr:merged":
+                handleMerge(gson.fromJson(new InputStreamReader(exchange.getRequestBody()), PullRequestMerged.class));
                 break;
             case "pr:declined":
-                handleDeclined();
+                handleDeclined(gson.fromJson(new InputStreamReader(exchange.getRequestBody()), PullRequestDeclined.class));
+                break;
+            case "pr:deleted":
+                handleDeleted(gson.fromJson(new InputStreamReader(exchange.getRequestBody()), PullRequestDeleted.class));
+                break;
+            case "pr:comment:added":
+                handleCommentAdded(gson.fromJson(new InputStreamReader(exchange.getRequestBody()), PullRequestNewComment.class));
                 break;
         }
 
         // TODO: 10/28/23 Close connection and send correct status code
     }
 
-    private void handleDeclined() {
-    }
-
-    private void handleModified() {
-    }
 
     private void handleOpened(PullRequestOpened opened) {
         de.derfrzocker.sprinkler.data.Repository repository = de.derfrzocker.sprinkler.data.Repository.valueOf(opened.pullRequest().toRef().repository().slug().toUpperCase());
@@ -55,10 +65,43 @@ public class PullRequestWebhookHandler implements HttpHandler {
         handler.handleNewPullRequest(newPullRequest);
     }
 
-    public record PullRequestNewComment() {
+    private void handleSourceUpdate(PullRequestSourceUpdate pullRequestSourceUpdate) {
+    }
+
+    private void handleModified(PullRequestModified pullRequestModified) {
+    }
+
+    private void handleMerge(PullRequestMerged pullRequestMerged) {
+    }
+
+    private void handleDeclined(PullRequestDeclined pullRequestDeclined) {
+    }
+
+    private void handleDeleted(PullRequestDeleted pullRequestDeleted) {
+    }
+
+    private void handleCommentAdded(PullRequestNewComment pullRequestNewComment) {
     }
 
     public record PullRequestOpened(Actor actor, PullRequest pullRequest) {
+    }
+
+    public record PullRequestSourceUpdate(Actor actor, PullRequest pullRequest) {
+    }
+
+    public record PullRequestModified(Actor actor, PullRequest pullRequest) {
+    }
+
+    public record PullRequestNewComment(Actor actor, PullRequest pullRequest, Comment comment) {
+    }
+
+    public record PullRequestMerged(Actor actor, PullRequest pullRequest) {
+    }
+
+    public record PullRequestDeleted(Actor actor, PullRequest pullRequest) {
+    }
+
+    public record PullRequestDeclined(Actor actor, PullRequest pullRequest) {
     }
 
     public record PullRequest(int id, String title, String description, String state, boolean open, boolean closed, Instant createdData, Instant updatedData, Ref toRef) {
@@ -71,5 +114,8 @@ public class PullRequestWebhookHandler implements HttpHandler {
     }
 
     public record Repository(String slug) {
+    }
+
+    public record Comment(String text) {
     }
 }

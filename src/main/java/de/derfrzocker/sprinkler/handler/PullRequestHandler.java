@@ -2,6 +2,7 @@ package de.derfrzocker.sprinkler.handler;
 
 import de.derfrzocker.sprinkler.data.handler.DeletePullRequest;
 import de.derfrzocker.sprinkler.data.handler.EditeComment;
+import de.derfrzocker.sprinkler.data.handler.ModifiedPullRequest;
 import de.derfrzocker.sprinkler.data.handler.NewComment;
 import de.derfrzocker.sprinkler.data.handler.NewCommit;
 import de.derfrzocker.sprinkler.data.handler.NewPullRequest;
@@ -10,6 +11,8 @@ import de.derfrzocker.sprinkler.data.handler.StatusUpdate;
 public interface PullRequestHandler {
 
     void handleNewPullRequest(NewPullRequest newPullRequest);
+
+    void handleModifiedPullRequest(ModifiedPullRequest modifiedPullRequest);
 
     void handleNewComment(NewComment newComment);
 
