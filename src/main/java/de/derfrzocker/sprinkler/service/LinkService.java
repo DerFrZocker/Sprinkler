@@ -6,9 +6,12 @@ import de.derfrzocker.sprinkler.data.PullRequest;
 import de.derfrzocker.sprinkler.data.PullRequestInfo;
 import de.derfrzocker.sprinkler.data.PullRequestLink;
 import de.derfrzocker.sprinkler.data.Repository;
-import de.derfrzocker.sprinkler.linker.Linker;
-import java.time.Duration;
+import de.derfrzocker.sprinkler.linker.filter.Filter;
+import de.derfrzocker.sprinkler.linker.searcher.Searcher;
+
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -22,22 +25,31 @@ import java.util.stream.Collectors;
 public class LinkService {
 
     private static final String SPECIAL_PREFIX = "!Link: ";
-    private static final Duration CREATE_WINDOW = Duration.ofHours(4);
 
+    private final Set<Filter> filters = new HashSet<>();
+    private final Set<Searcher> searchers = new HashSet<>();
     private final Set<String> specialLinker;
-    private final Linker linker;
     private final PullRequestDao pullRequestDao;
     private final LinkerDao linkerDao;
 
-    public LinkService(Set<String> specialLinker, Linker linker, PullRequestDao pullRequestDao, LinkerDao linkerDao) {
+    public LinkService(Set<String> specialLinker, PullRequestDao pullRequestDao, LinkerDao linkerDao) {
         this.specialLinker = specialLinker;
-        this.linker = linker;
         this.pullRequestDao = pullRequestDao;
         this.linkerDao = linkerDao;
     }
 
+    public void registerFilter(Filter filter) {
+        filters.add(filter);
+    }
+
+    public void registerSearchers(Searcher searcher) {
+        searchers.add(searcher);
+    }
+
     public void searchAndCreateLink(String requester, PullRequest pullRequest, String message) {
-        Set<PullRequestInfo> links = searchForLink(requester, pullRequest, message);
+        // Allow special linker to link every pull request together
+        boolean specialLink = message.startsWith(SPECIAL_PREFIX) && specialLinker.contains(requester);
+        Set<PullRequestInfo> links = searchForLink(specialLink, requester, pullRequest, message);
 
         links.add(pullRequest.getInfo()); // Add self to link
 
@@ -48,7 +60,7 @@ public class LinkService {
                 .map(Optional::get)
                 .collect(Collectors.toSet());
 
-        PullRequestLink link = new PullRequestLink(links);
+        PullRequestLink link = new PullRequestLink(specialLink, links);
 
         if (existingLinks.isEmpty()) {
             linkerDao.create(link);
@@ -71,17 +83,21 @@ public class LinkService {
         linkerDao.get(pullRequestInfo).ifPresent(linkerDao::remove);
     }
 
-    private Set<PullRequestInfo> searchForLink(String requester, PullRequest pullRequest, String message) {
-        // Allow special linker to link every pull request together
-        boolean specialLink = message.startsWith(SPECIAL_PREFIX) && specialLinker.contains(requester);
-
+    private Set<PullRequestInfo> searchForLink(boolean specialLink, String requester, PullRequest pullRequest,
+                                               String message) {
         if (!specialLink && !pullRequest.getAuthorId().equals(requester)) {
             return Collections.emptySet();
         }
 
-        Set<PullRequestInfo> links = linker.searchForLink(message)
-                .stream()
-                // It does not make any sense to link two pull requests together, which are from the same repository
+        Set<PullRequestInfo> links = searchers.stream().map(searcher -> searcher.searchForLink(message))
+                .flatMap(Collection::stream)
+                // It does not make any sense to link two pull requests together, which are from
+                // the same repository
+                // We filter them here extra instead of with a Filter object, since this is a
+                // hard requirement.
+                // And the other filters are soft and can be overridden with the special link
+                // If we have down the line more hard requirements we can use a filter system
+                // here as well, but for now it should be fine
                 .filter(found -> found.repository() != pullRequest.getInfo().repository())
                 .collect(Collectors.toSet());
 
@@ -92,9 +108,8 @@ public class LinkService {
                     .map(pullRequestDao::get)
                     .filter(Optional::isPresent)
                     .map(Optional::get)
-                    .filter(found -> filterAuthor(pullRequest, found))
-                    .filter(found -> filterDate(pullRequest, found))
-                    .filter(found -> filterRev(pullRequest, found))
+                    .filter(found -> filters.stream().filter(filter -> !filter.isApplicable(pullRequest, found))
+                            .findAny().isEmpty())
                     .map(PullRequest::getInfo)
                     .collect(Collectors.toSet());
         }
@@ -149,17 +164,5 @@ public class LinkService {
         }
 
         return links;
-    }
-
-    private boolean filterDate(PullRequest newPullRequest, PullRequest foundPullRequest) {
-        return CREATE_WINDOW.compareTo(Duration.between(newPullRequest.getCreateDate(), foundPullRequest.getCreateDate()).abs()) >= 0;
-    }
-
-    private boolean filterRev(PullRequest newPullRequest, PullRequest foundPullRequest) {
-        return !Collections.disjoint(newPullRequest.getRev(), foundPullRequest.getRev());
-    }
-
-    private boolean filterAuthor(PullRequest newPullRequest, PullRequest foundPullRequest) {
-        return newPullRequest.getAuthorId().equals(foundPullRequest.getAuthorId());
     }
 }

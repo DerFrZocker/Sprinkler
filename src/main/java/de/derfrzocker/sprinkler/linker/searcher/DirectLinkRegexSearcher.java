@@ -1,16 +1,18 @@
-package de.derfrzocker.sprinkler.linker;
+package de.derfrzocker.sprinkler.linker.searcher;
 
 import de.derfrzocker.sprinkler.data.PullRequestInfo;
 import de.derfrzocker.sprinkler.data.Repository;
+
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class BasicRegexLinkLinker implements Linker {
+public class DirectLinkRegexSearcher implements Searcher {
 
-    private static final Pattern PATTERN = Pattern.compile("https?://hub.spigotmc.org/stash/projects/SPIGOT/repos/(craftbukkit|spigot|bukkit)/pull-requests/*d");
+    private static final Pattern PATTERN = Pattern.compile(
+            "https?://hub.spigotmc.org/stash/projects/SPIGOT/repos/(craftbukkit|spigot|bukkit)/pull-requests/*d");
 
     @Override
     public Set<PullRequestInfo> searchForLink(String message) {

@@ -1,14 +1,15 @@
-package de.derfrzocker.sprinkler.linker;
+package de.derfrzocker.sprinkler.linker.searcher;
 
 import de.derfrzocker.sprinkler.data.PullRequestInfo;
 import de.derfrzocker.sprinkler.data.Repository;
+
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class BasicRegexPatternLinker implements Linker {
+public class IndirectLinkRegexSearcher implements Searcher {
 
     private static final Pattern PATTERN = Pattern.compile("(craftbukkit|spigot|bukkit):*d");
 
