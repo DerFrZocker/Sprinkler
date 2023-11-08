@@ -21,6 +21,7 @@ public class RevService {
     }
 
     public Set<Rev> getRev(PullRequest pullRequest) {
+        // TODO: 11/7/23 Add branch 
         Stream<Commit> commitStream = commitDao.getCommits(pullRequest.getInfo());
 
         return commitStream

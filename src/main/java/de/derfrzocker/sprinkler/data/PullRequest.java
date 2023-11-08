@@ -11,6 +11,7 @@ public class PullRequest {
     private String branch;
     private Set<Rev> rev;
     private String title;
+    private String description;
     private Status status;
 
     public PullRequest(PullRequestInfo info, Instant createDate, String authorId) {
@@ -45,6 +46,14 @@ public class PullRequest {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Status getStatus() {

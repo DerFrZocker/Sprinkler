@@ -3,20 +3,20 @@ package de.derfrzocker.sprinkler.webhook;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import de.derfrzocker.sprinkler.data.PullRequest;
-import de.derfrzocker.sprinkler.data.handler.NewPullRequest;
-import de.derfrzocker.sprinkler.handler.PullRequestHandler;
+import de.derfrzocker.sprinkler.event.PullRequestCreateEvent;
+import de.derfrzocker.sprinkler.event.PullRequestEventManager;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.Instant;
 
 public class PullRequestWebhookHandler implements HttpHandler {
 
-    private final PullRequestHandler handler;
+    private final PullRequestEventManager eventManager;
     private final Gson gson;
 
-    public PullRequestWebhookHandler(PullRequestHandler handler) {
-        this.handler = handler;
+    public PullRequestWebhookHandler(PullRequestEventManager eventManager) {
+        this.eventManager = eventManager;
         this.gson = new Gson();
     }
 
@@ -60,9 +60,9 @@ public class PullRequestWebhookHandler implements HttpHandler {
 
     private void handleOpened(PullRequestOpened opened) {
         de.derfrzocker.sprinkler.data.Repository repository = de.derfrzocker.sprinkler.data.Repository.valueOf(opened.pullRequest().toRef().repository().slug().toUpperCase());
-        NewPullRequest newPullRequest = new NewPullRequest(repository, opened.pullRequest().id(), opened.actor().slug(), opened.pullRequest().title(), opened.pullRequest().description(), opened.pullRequest().toRef().displayId(), opened.pullRequest().createdData());
+        PullRequestCreateEvent pullRequestCreateEvent = new PullRequestCreateEvent(repository, opened.pullRequest().id(), opened.actor().slug(), opened.pullRequest().title(), opened.pullRequest().description(), opened.pullRequest().toRef().displayId(), opened.pullRequest().createdData());
 
-        handler.handleNewPullRequest(newPullRequest);
+        eventManager.callEvent(pullRequestCreateEvent);
     }
 
     private void handleSourceUpdate(PullRequestSourceUpdate pullRequestSourceUpdate) {
@@ -104,7 +104,8 @@ public class PullRequestWebhookHandler implements HttpHandler {
     public record PullRequestDeclined(Actor actor, PullRequest pullRequest) {
     }
 
-    public record PullRequest(int id, String title, String description, String state, boolean open, boolean closed, Instant createdData, Instant updatedData, Ref toRef) {
+    public record PullRequest(int id, String title, String description, String state, boolean open, boolean closed,
+                              Instant createdData, Instant updatedData, Ref toRef) {
     }
 
     public record Actor(String name, int id, String slug) {
