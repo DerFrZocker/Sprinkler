@@ -3,21 +3,24 @@ package de.derfrzocker.sprinkler.webhook;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import de.derfrzocker.sprinkler.event.PullRequestCreateEvent;
-import de.derfrzocker.sprinkler.event.PullRequestEventManager;
+import de.derfrzocker.sprinkler.webhook.request.handler.RequestHandler;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PullRequestWebhookHandler implements HttpHandler {
 
-    private final PullRequestEventManager eventManager;
+    private final Map<String, RequestHandler<?>> handlers = new HashMap<>();
     private final Gson gson;
 
-    public PullRequestWebhookHandler(PullRequestEventManager eventManager) {
-        this.eventManager = eventManager;
+    public PullRequestWebhookHandler() {
         this.gson = new Gson();
+    }
+
+    public void registerRequestHandler(RequestHandler<?> requestHandler) {
+        handlers.put(requestHandler.getRequestKey(), requestHandler);
     }
 
     @Override
@@ -28,95 +31,22 @@ public class PullRequestWebhookHandler implements HttpHandler {
             return;
         }
 
-        // TODO: 10/30/23 Add auth check 
+        // TODO: 10/30/23 Add auth check
 
-        switch (request) {
-            case "pr:opened":
-                handleOpened(gson.fromJson(new InputStreamReader(exchange.getRequestBody()), PullRequestOpened.class));
-                break;
-            case "pr:from_ref_updated payload":
-                handleSourceUpdate(gson.fromJson(new InputStreamReader(exchange.getRequestBody()), PullRequestSourceUpdate.class));
-                break;
-            case "pr:modified":
-                handleModified(gson.fromJson(new InputStreamReader(exchange.getRequestBody()), PullRequestModified.class));
-                break;
-            case "pr:merged":
-                handleMerge(gson.fromJson(new InputStreamReader(exchange.getRequestBody()), PullRequestMerged.class));
-                break;
-            case "pr:declined":
-                handleDeclined(gson.fromJson(new InputStreamReader(exchange.getRequestBody()), PullRequestDeclined.class));
-                break;
-            case "pr:deleted":
-                handleDeleted(gson.fromJson(new InputStreamReader(exchange.getRequestBody()), PullRequestDeleted.class));
-                break;
-            case "pr:comment:added":
-                handleCommentAdded(gson.fromJson(new InputStreamReader(exchange.getRequestBody()), PullRequestNewComment.class));
-                break;
+        RequestHandler<?> requestHandler = handlers.get(request);
+
+        if (requestHandler == null) {
+            // TODO: 11/08/23 return correct status code
+            return;
         }
+
+        handleRequest(exchange, requestHandler);
 
         // TODO: 10/28/23 Close connection and send correct status code
     }
 
-
-    private void handleOpened(PullRequestOpened opened) {
-        de.derfrzocker.sprinkler.data.Repository repository = de.derfrzocker.sprinkler.data.Repository.valueOf(opened.pullRequest().toRef().repository().slug().toUpperCase());
-        PullRequestCreateEvent pullRequestCreateEvent = new PullRequestCreateEvent(repository, opened.pullRequest().id(), opened.actor().slug(), opened.pullRequest().title(), opened.pullRequest().description(), opened.pullRequest().toRef().displayId(), opened.pullRequest().createdData());
-
-        eventManager.callEvent(pullRequestCreateEvent);
-    }
-
-    private void handleSourceUpdate(PullRequestSourceUpdate pullRequestSourceUpdate) {
-    }
-
-    private void handleModified(PullRequestModified pullRequestModified) {
-    }
-
-    private void handleMerge(PullRequestMerged pullRequestMerged) {
-    }
-
-    private void handleDeclined(PullRequestDeclined pullRequestDeclined) {
-    }
-
-    private void handleDeleted(PullRequestDeleted pullRequestDeleted) {
-    }
-
-    private void handleCommentAdded(PullRequestNewComment pullRequestNewComment) {
-    }
-
-    public record PullRequestOpened(Actor actor, PullRequest pullRequest) {
-    }
-
-    public record PullRequestSourceUpdate(Actor actor, PullRequest pullRequest) {
-    }
-
-    public record PullRequestModified(Actor actor, PullRequest pullRequest) {
-    }
-
-    public record PullRequestNewComment(Actor actor, PullRequest pullRequest, Comment comment) {
-    }
-
-    public record PullRequestMerged(Actor actor, PullRequest pullRequest) {
-    }
-
-    public record PullRequestDeleted(Actor actor, PullRequest pullRequest) {
-    }
-
-    public record PullRequestDeclined(Actor actor, PullRequest pullRequest) {
-    }
-
-    public record PullRequest(int id, String title, String description, String state, boolean open, boolean closed,
-                              Instant createdData, Instant updatedData, Ref toRef) {
-    }
-
-    public record Actor(String name, int id, String slug) {
-    }
-
-    public record Ref(String id, String displayId, Repository repository) {
-    }
-
-    public record Repository(String slug) {
-    }
-
-    public record Comment(String text) {
+    private <T> void handleRequest(HttpExchange exchange, RequestHandler<T> requestHandler) {
+        requestHandler.handle(
+                gson.fromJson(new InputStreamReader(exchange.getRequestBody()), requestHandler.getRequestType()));
     }
 }
