@@ -3,12 +3,15 @@ package de.derfrzocker.sprinkler.event.handler;
 import de.derfrzocker.sprinkler.dao.PullRequestDao;
 import de.derfrzocker.sprinkler.data.PullRequest;
 import de.derfrzocker.sprinkler.data.PullRequestInfo;
+import de.derfrzocker.sprinkler.data.Rev;
 import de.derfrzocker.sprinkler.data.Status;
 import de.derfrzocker.sprinkler.event.PullRequestCreateEvent;
 import de.derfrzocker.sprinkler.service.LinkService;
 import de.derfrzocker.sprinkler.service.RevService;
 
 import java.util.Optional;
+import java.util.Set;
+import java.util.Collections;
 
 public class PullRequestCreateEventHandler implements PullRequestEventHandler<PullRequestCreateEvent> {
 
@@ -38,7 +41,14 @@ public class PullRequestCreateEventHandler implements PullRequestEventHandler<Pu
         pullRequest.setTitle(event.getTitle());
         pullRequest.setBranch(event.getBranch());
 
-        pullRequest.setRev(revService.getRev(pullRequest));
+        Set<Rev> revs;
+        if ("master".equals(pullRequest.getBranch())) { // TODO 11/14/23 Make configurateable
+            revs = revService.getRev(pullRequest);
+        } else {
+            revs = Collections.emptySet();
+        }
+        pullRequest.setRev(revs);
+
         linkService.searchAndCreateLink(pullRequest.getAuthorId(), pullRequest, event.getDescription());
 
         requestDao.create(pullRequest);

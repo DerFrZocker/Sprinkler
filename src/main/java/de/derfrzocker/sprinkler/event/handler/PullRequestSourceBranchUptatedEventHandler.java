@@ -8,7 +8,8 @@ import de.derfrzocker.sprinkler.service.RevService;
 
 import java.util.Set;
 
-public class PullRequestSourceBranchUptatedEventHandler extends BasePullRequestEventHandler<PullRequestSourceBranchUpdatedEvent> {
+public class PullRequestSourceBranchUptatedEventHandler
+        extends BasePullRequestEventHandler<PullRequestSourceBranchUpdatedEvent> {
 
     private final RevService revService;
 
@@ -19,6 +20,10 @@ public class PullRequestSourceBranchUptatedEventHandler extends BasePullRequestE
 
     @Override
     public void handle(PullRequest pullRequest, PullRequestSourceBranchUpdatedEvent event) {
+        if (!"master".equals(pullRequest.getBranch())) {
+            return;
+        }
+
         Set<Rev> revs = revService.getRev(pullRequest);
         pullRequest.setRev(revs);
         requestDao.update(pullRequest);
@@ -29,4 +34,3 @@ public class PullRequestSourceBranchUptatedEventHandler extends BasePullRequestE
         return PullRequestSourceBranchUpdatedEvent.class;
     }
 }
-

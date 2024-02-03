@@ -74,6 +74,11 @@ public class LinkService {
             // TODO: 10/27/23 Log inconsistency, this should not happen
         }
 
+        if (existingLinks.stream().anyMatch(PullRequestLink::hardLink) && !specialLink) {
+            // A normal user cannot override a special link
+            return;
+        }
+
         existingLinks.forEach(linkerDao::remove);
 
         linkerDao.create(link);
@@ -84,7 +89,7 @@ public class LinkService {
     }
 
     private Set<PullRequestInfo> searchForLink(boolean specialLink, String requester, PullRequest pullRequest,
-                                               String message) {
+            String message) {
         if (!specialLink && !pullRequest.getAuthorId().equals(requester)) {
             return Collections.emptySet();
         }

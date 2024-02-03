@@ -38,27 +38,27 @@ public class BitbucketCommitDao implements CommitDao {
             }
 
             // 50/50 chance that this works
-            int[] index = new int[]{1};
-            BatchResponse[] responses = new BatchResponse[]{firstBatch};
+            int[] index = new int[] { 1 };
+            BatchResponse[] responses = new BatchResponse[] { firstBatch };
             return Stream.iterate(firstBatch.values().get(0).parents(),
-                            pre -> responses[0].values().size() >= index[0] || !responses[0].isLastPage(),
-                            pre -> {
-                                if (responses[0].values().size() < index[0]) {
-                                    try {
-                                        responses[0] = getBatch(repository, pullRequestInfo.id(), responses[0].nextPageStart);
-                                        index[0] = 0;
-                                    } catch (IOException | InterruptedException e) {
-                                        throw new RuntimeException(e);
-                                    }
+                    pre -> responses[0].values().size() >= index[0] || !responses[0].isLastPage(),
+                    pre -> {
+                        if (responses[0].values().size() < index[0]) {
+                            try {
+                                responses[0] = getBatch(repository, pullRequestInfo.id(), responses[0].nextPageStart);
+                                index[0] = 0;
+                            } catch (IOException | InterruptedException e) {
+                                throw new RuntimeException(e);
+                            }
 
-                                    CommitValue value = responses[0].values().get(index[0]);
+                            CommitValue value = responses[0].values().get(index[0]);
 
-                                    index[0]++;
+                            index[0]++;
 
-                                    return value.parents();
-                                }
-                                return null;
-                            })
+                            return value.parents();
+                        }
+                        return null;
+                    })
                     .map(parent -> parent.stream().map(CommitParent::id).toList())
                     .map(Commit::new);
         } catch (IOException | InterruptedException e) {

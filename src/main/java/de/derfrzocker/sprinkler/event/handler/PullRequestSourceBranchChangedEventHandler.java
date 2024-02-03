@@ -8,6 +8,7 @@ import de.derfrzocker.sprinkler.service.RevService;
 
 import java.util.Objects;
 import java.util.Set;
+import java.util.Collections;
 
 public class PullRequestSourceBranchChangedEventHandler
         extends BasePullRequestEventHandler<PullRequestSourceBranchChangedEvent> {
@@ -26,7 +27,13 @@ public class PullRequestSourceBranchChangedEventHandler
             return;
         }
 
-        Set<Rev> revs = revService.getRev(pullRequest);
+        Set<Rev> revs;
+        if ("master".equals(event.getBranch())) { // TODO 11/14/23 Make configurateable
+            revs = revService.getRev(pullRequest);
+        } else {
+            revs = Collections.emptySet();
+        }
+
         pullRequest.setRev(revs);
         requestDao.update(pullRequest);
     }
