@@ -8,6 +8,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.stream.Stream;
@@ -21,7 +22,7 @@ public class BitbucketCommitDao implements CommitDao {
     private final Gson gson;
 
     public BitbucketCommitDao(String username, String password) {
-        this.authorization = new String(Base64.getDecoder().decode(username + ":" + password));
+        this.authorization = new String(Base64.getEncoder().encode((username + ":" + password).getBytes(StandardCharsets.UTF_8)));
         this.httpClient = HttpClient.newHttpClient();
         this.gson = new Gson();
     }
