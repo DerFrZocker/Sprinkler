@@ -73,7 +73,7 @@ public class Main {
 
         // Create Server
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0); // TODO 2024-02-15: Make configuratable
-        server.createContext("api/v1/bitbucket-webhook", webhookHandler);
+        server.createContext("/api/v1/bitbucket-webhook/", webhookHandler);
         // Application is designed for single Thread only, but should be enough since at
         // best two or three PR will be modified in the same minute, with long pauses
         // between.
