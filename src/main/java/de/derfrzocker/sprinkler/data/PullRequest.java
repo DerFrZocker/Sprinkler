@@ -3,7 +3,7 @@ package de.derfrzocker.sprinkler.data;
 import java.time.Instant;
 import java.util.Set;
 
-public class PullRequest {
+public class PullRequest implements Cloneable {
 
     private final PullRequestInfo info;
     private final Instant createDate;
@@ -70,5 +70,14 @@ public class PullRequest {
 
     public Instant getCreateDate() {
         return createDate;
+    }
+
+    @Override
+    public PullRequest clone() {
+        try {
+            return (PullRequest) super.clone(); // Rev list should be unmodifiable, so no need to copy it
+        } catch (CloneNotSupportedException e) {
+            throw new UnsupportedOperationException(e);
+        }
     }
 }
