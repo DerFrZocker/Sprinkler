@@ -8,8 +8,11 @@ import java.util.Objects;
 
 public class PullRequestTitleUpdatedEventHandler extends BasePullRequestEventHandler<PullRequestTitleUpdatedEvent> {
 
+    private final PullRequestDao requestDao;
+
     public PullRequestTitleUpdatedEventHandler(PullRequestDao requestDao) {
         super(requestDao);
+        this.requestDao = requestDao;
     }
 
     @Override

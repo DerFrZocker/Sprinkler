@@ -79,13 +79,9 @@ public class LinkService {
             return;
         }
 
-        existingLinks.forEach(linkerDao::remove);
+        existingLinks.forEach(linkerDao::removeByValue);
 
         linkerDao.create(link);
-    }
-
-    public void removeLinks(PullRequestInfo pullRequestInfo) {
-        linkerDao.get(pullRequestInfo).ifPresent(linkerDao::remove);
     }
 
     private Set<PullRequestInfo> searchForLink(boolean specialLink, String requester, PullRequest pullRequest,

@@ -55,7 +55,7 @@ public class Main {
         manager.registerEventHandler(new PullRequestSourceBranchChangedEventHandler(pullRequestDao, revService));
         manager.registerEventHandler(new PullRequestMergedEventHandler(pullRequestDao));
         manager.registerEventHandler(new PullRequestDescriptionUpdatedEventHandler(pullRequestDao, linkService));
-        manager.registerEventHandler(new PullRequestDeletedEventHandler(pullRequestDao, linkService));
+        manager.registerEventHandler(new PullRequestDeletedEventHandler(pullRequestDao, linkerDao));
         manager.registerEventHandler(new PullRequestDeclinedEventHandler(pullRequestDao));
         manager.registerEventHandler(new PullRequestCreateEventHandler(pullRequestDao, revService, linkService));
         manager.registerEventHandler(new PullRequestCommentAddedEventHandler(pullRequestDao, linkService));

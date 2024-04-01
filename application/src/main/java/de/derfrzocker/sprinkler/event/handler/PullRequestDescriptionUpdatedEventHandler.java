@@ -10,10 +10,12 @@ import java.util.Objects;
 public class PullRequestDescriptionUpdatedEventHandler
         extends BasePullRequestEventHandler<PullRequestDescriptionUptatedEvent> {
 
+    private final PullRequestDao requestDao;
     private final LinkService linkService;
 
     public PullRequestDescriptionUpdatedEventHandler(PullRequestDao requestDao, LinkService linkService) {
         super(requestDao);
+        this.requestDao = requestDao;
         this.linkService = linkService;
     }
 

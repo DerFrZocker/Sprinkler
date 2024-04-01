@@ -1,6 +1,6 @@
 package de.derfrzocker.sprinkler.event.handler;
 
-import de.derfrzocker.sprinkler.dao.PullRequestDao;
+import de.derfrzocker.sprinkler.dao.ReadingDao;
 import de.derfrzocker.sprinkler.data.PullRequest;
 import de.derfrzocker.sprinkler.data.PullRequestInfo;
 import de.derfrzocker.sprinkler.event.PullRequestEvent;
@@ -9,17 +9,17 @@ import java.util.Optional;
 
 public abstract class BasePullRequestEventHandler<T extends PullRequestEvent> implements PullRequestEventHandler<T> {
 
-    protected final PullRequestDao requestDao;
+    protected final ReadingDao<PullRequestInfo, PullRequest> readingPullRequestDao;
 
-    public BasePullRequestEventHandler(PullRequestDao requestDao) {
-        this.requestDao = requestDao;
+    public BasePullRequestEventHandler(ReadingDao<PullRequestInfo, PullRequest> readingDao) {
+        this.readingPullRequestDao = readingDao;
     }
 
     @Override
     public final void handle(T event) {
         PullRequestInfo pullRequestInfo = new PullRequestInfo(event.getRepository(), event.getPullRequestId());
 
-        Optional<PullRequest> pullRequest = requestDao.get(pullRequestInfo);
+        Optional<PullRequest> pullRequest = readingPullRequestDao.get(pullRequestInfo);
 
         if (pullRequest.isEmpty()) {
             // Probably an old PR ignore

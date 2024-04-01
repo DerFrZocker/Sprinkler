@@ -9,8 +9,12 @@ import java.util.Objects;
 
 public class PullRequestDeclinedEventHandler extends BasePullRequestEventHandler<PullRequestDeclinedEvent> {
 
+    private final PullRequestDao requestDao;
+
     public PullRequestDeclinedEventHandler(PullRequestDao requestDao) {
         super(requestDao);
+
+        this.requestDao = requestDao;
     }
 
     @Override

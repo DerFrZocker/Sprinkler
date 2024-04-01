@@ -13,11 +13,13 @@ import java.util.Set;
 public class PullRequestSourceBranchChangedEventHandler
         extends BasePullRequestEventHandler<PullRequestSourceBranchChangedEvent> {
 
+    private final PullRequestDao requestDao;
     private final RevService revService;
 
     public PullRequestSourceBranchChangedEventHandler(PullRequestDao requestDao, RevService revService) {
         super(requestDao);
         this.revService = revService;
+        this.requestDao = requestDao;
     }
 
     @Override

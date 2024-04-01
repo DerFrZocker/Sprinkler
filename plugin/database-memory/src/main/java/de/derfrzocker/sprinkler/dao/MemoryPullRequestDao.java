@@ -32,13 +32,18 @@ public class MemoryPullRequestDao implements PullRequestDao {
     }
 
     @Override
-    public void remove(PullRequestInfo pullRequestInfo) {
-        pullRequests.remove(pullRequestInfo);
+    public void create(PullRequest pullRequest) {
+        pullRequests.put(pullRequest.getInfo(), pullRequest.clone());
     }
 
     @Override
-    public void create(PullRequest pullRequest) {
-        pullRequests.put(pullRequest.getInfo(), pullRequest.clone());
+    public void removeByValue(PullRequest value) {
+        pullRequests.remove(value.getInfo());
+    }
+
+    @Override
+    public void removeByKey(PullRequestInfo key) {
+        pullRequests.remove(key);
     }
 
     @Override

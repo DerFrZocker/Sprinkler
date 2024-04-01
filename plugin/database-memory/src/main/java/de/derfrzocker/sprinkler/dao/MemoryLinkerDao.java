@@ -26,10 +26,21 @@ public class MemoryLinkerDao implements LinkerDao {
     }
 
     @Override
-    public void remove(PullRequestLink link) {
+    public void removeByValue(PullRequestLink link) {
         for (PullRequestInfo info : link.linked()) {
             pullRequestLinks.remove(info);
         }
+    }
+
+    @Override
+    public void removeByKey(PullRequestInfo key) {
+        get(key).ifPresent(this::removeByValue);
+    }
+
+    @Override
+    public void update(PullRequestLink value) {
+        removeByValue(value);
+        create(value);
     }
 
     @Override

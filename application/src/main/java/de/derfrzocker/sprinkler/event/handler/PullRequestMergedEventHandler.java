@@ -9,8 +9,11 @@ import java.util.Objects;
 
 public class PullRequestMergedEventHandler extends BasePullRequestEventHandler<PullRequestMergedEvent> {
 
+    private final PullRequestDao requestDao;
+
     public PullRequestMergedEventHandler(PullRequestDao requestDao) {
         super(requestDao);
+        this.requestDao = requestDao;
     }
 
     @Override

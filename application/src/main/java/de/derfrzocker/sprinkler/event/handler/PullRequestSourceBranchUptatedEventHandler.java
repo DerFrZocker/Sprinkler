@@ -11,10 +11,12 @@ import java.util.Set;
 public class PullRequestSourceBranchUptatedEventHandler
         extends BasePullRequestEventHandler<PullRequestSourceBranchUpdatedEvent> {
 
+    private final PullRequestDao requestDao;
     private final RevService revService;
 
     public PullRequestSourceBranchUptatedEventHandler(PullRequestDao requestDao, RevService revService) {
         super(requestDao);
+        this.requestDao = requestDao;
         this.revService = revService;
     }
 
