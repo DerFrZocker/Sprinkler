@@ -48,13 +48,25 @@ public class LinkService {
     }
 
     public void searchAndCreateLink(String requester, PullRequest pullRequest, String message) {
-        Set<PullRequestInfo> links = searchForLink(requester, pullRequest, message);
+        if (!shouldHardLink(message, requester) && isSameAuthor(pullRequest, requester)) {
+            return;
+        }
+        Set<PullRequestInfo> mentionedPullRequests = searchForOtherPullRequestsMentionedIn(message, pullRequest);
 
-        links.add(pullRequest.getInfo()); // Add self to link
+        if (!shouldHardLink(message, requester)) {
+            mentionedPullRequests = applyFiltersTo(mentionedPullRequests, pullRequest);
+        }
 
-        Set<PullRequestLink> existingLinks = getExistingLinksFor(links);
+        if (moreThanOneRepositoryPerTypeIsPresent(mentionedPullRequests)) {
+            Logger.getLogger(LinkService.class.getName()).info(String.format("The searchers and filters where not able to only find one link per repository for message '%s', manuel linking is required.", message));
+            return;
+        }
 
-        PullRequestLink link = new PullRequestLink(shouldHardLink(message, requester), links);
+        mentionedPullRequests.add(pullRequest.getInfo());
+
+        Set<PullRequestLink> existingLinks = getExistingLinksFor(mentionedPullRequests);
+
+        PullRequestLink link = new PullRequestLink(shouldHardLink(message, requester), mentionedPullRequests);
 
         if (linkIsAlreadyPresent(existingLinks, link)) {
             return;
@@ -67,25 +79,6 @@ public class LinkService {
         unlinkExistingLinks(existingLinks);
 
         linkerDao.create(link);
-    }
-
-    private Set<PullRequestInfo> searchForLink(String requester, PullRequest pullRequest, String message) {
-        if (!shouldHardLink(message, requester) && isSameAuthor(pullRequest, requester)) {
-            return Collections.emptySet();
-        }
-
-        Set<PullRequestInfo> links = searchForOtherPullRequestsMentionedIn(message, pullRequest);
-
-        if (!shouldHardLink(message, requester)) {
-            links = applyFiltersTo(links, pullRequest);
-        }
-
-        if (moreThanOneRepositoryPerTypeIsPresent(links)) {
-            Logger.getLogger(LinkService.class.getName()).info(String.format("The searchers and filters where not able to only find one link per repository for message '%s', manuel linking is required.", message));
-            return Collections.emptySet();
-        }
-
-        return links;
     }
 
     public boolean shouldHardLink(String message, String requester) {
