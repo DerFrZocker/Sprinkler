@@ -48,20 +48,19 @@ public class LinkService {
     }
 
     public void searchAndCreateLink(String requester, PullRequest pullRequest, String message) {
-        boolean specialLink = shouldHardLink(message, requester);
-        Set<PullRequestInfo> links = searchForLink(specialLink, requester, pullRequest, message);
+        Set<PullRequestInfo> links = searchForLink(requester, pullRequest, message);
 
         links.add(pullRequest.getInfo()); // Add self to link
 
         Set<PullRequestLink> existingLinks = getExistingLinksFor(links);
 
-        PullRequestLink link = new PullRequestLink(specialLink, links);
+        PullRequestLink link = new PullRequestLink(shouldHardLink(message, requester), links);
 
         if (linkIsAlreadyPresent(existingLinks, link)) {
             return;
         }
 
-        if (!specialLink && linksContainsHardLink(existingLinks)) {
+        if (!shouldHardLink(message, requester) && linksContainsHardLink(existingLinks)) {
             return;
         }
 
@@ -70,15 +69,14 @@ public class LinkService {
         linkerDao.create(link);
     }
 
-    private Set<PullRequestInfo> searchForLink(boolean specialLink, String requester, PullRequest pullRequest,
-                                               String message) {
-        if (!specialLink && isSameAuthor(pullRequest, requester)) {
+    private Set<PullRequestInfo> searchForLink(String requester, PullRequest pullRequest, String message) {
+        if (!shouldHardLink(message, requester) && isSameAuthor(pullRequest, requester)) {
             return Collections.emptySet();
         }
 
         Set<PullRequestInfo> links = searchForOtherPullRequestsMentionedIn(message, pullRequest);
 
-        if (!specialLink) {
+        if (!shouldHardLink(message, requester)) {
             links = applyFiltersTo(links, pullRequest);
         }
 
