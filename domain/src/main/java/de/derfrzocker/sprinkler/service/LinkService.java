@@ -47,77 +47,103 @@ public class LinkService {
     }
 
     public void searchAndCreateLink(String requester, PullRequest pullRequest, String message) {
-        // Allow special linker to link every pull request together
-        boolean specialLink = message.startsWith(SPECIAL_PREFIX) && specialLinker.contains(requester);
+        boolean specialLink = shouldHardLink(message, requester);
         Set<PullRequestInfo> links = searchForLink(specialLink, requester, pullRequest, message);
 
         links.add(pullRequest.getInfo()); // Add self to link
 
-        Set<PullRequestLink> existingLinks = links
-                .stream()
-                .map(linkerDao::get)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toSet());
+        Set<PullRequestLink> existingLinks = getExistingLinksFor(links);
 
         PullRequestLink link = new PullRequestLink(specialLink, links);
 
-        if (existingLinks.isEmpty()) {
-            linkerDao.create(link);
+        if (linkIsAlreadyPresent(existingLinks, link)) {
             return;
         }
 
-        if (existingLinks.contains(link)) {
-            if (existingLinks.size() == 1) {
-                return;
-            }
-            // TODO: 10/27/23 Log inconsistency, this should not happen
-        }
-
-        if (existingLinks.stream().anyMatch(PullRequestLink::hardLink) && !specialLink) {
-            // A normal user cannot override a special link
+        if (!specialLink && linksContainsHardLink(existingLinks)) {
             return;
         }
 
-        existingLinks.forEach(linkerDao::removeByValue);
+        unlinkExistingLinks(existingLinks);
 
         linkerDao.create(link);
     }
 
     private Set<PullRequestInfo> searchForLink(boolean specialLink, String requester, PullRequest pullRequest,
                                                String message) {
-        // If it is not a hard link, then only the author, which created the PR can modify it
-        if (!specialLink && !pullRequest.getAuthorId().equals(requester)) {
+        if (!specialLink && isSameAuthor(pullRequest, requester)) {
             return Collections.emptySet();
         }
 
-        Set<PullRequestInfo> links = searchers.stream().map(searcher -> searcher.searchForLink(message))
-                .flatMap(Collection::stream)
-                // It does not make any sense to link two pull requests together, which are from
-                // the same repository
-                // We filter them here extra instead of with a Filter object, since this is a
-                // hard requirement.
-                // And the other filters are soft and can be overridden with the special link
-                // If we have down the line more hard requirements we can use a filter system
-                // here as well, but for now it should be fine
-                .filter(found -> found.repository() != pullRequest.getInfo().repository())
-                .collect(Collectors.toSet());
+        Set<PullRequestInfo> links = searchForOtherPullRequestsMentionedIn(message, pullRequest);
 
         if (!specialLink) {
-            // Make more checks if it is not a special link
-            links = links
-                    .stream()
-                    .map(pullRequestDao::get)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .filter(found -> filters.stream().filter(filter -> !filter.isApplicable(pullRequest, found))
-                            .findAny().isEmpty())
-                    .map(PullRequest::getInfo)
-                    .collect(Collectors.toSet());
+            links = applyFiltersTo(links, pullRequest);
         }
 
-        // At this point, there should only be one pull request info per repository,
-        // otherwise we cannot link them together reliabel
+        if (moreThanOneRepositoryPerTypeIsPresent(links)) {
+            return Collections.emptySet();
+        }
+
+        return links;
+    }
+
+    public boolean shouldHardLink(String message, String requester) {
+        return message.startsWith(SPECIAL_PREFIX) && specialLinker.contains(requester);
+    }
+
+    public Set<PullRequestLink> getExistingLinksFor(Collection<PullRequestInfo> pullRequestInfos) {
+        return pullRequestInfos
+                .stream()
+                .map(linkerDao::get)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toSet());
+    }
+
+    public boolean linkIsAlreadyPresent(Collection<PullRequestLink> links, PullRequestLink link) {
+        if (links.contains(link)) {
+            if (links.size() == 1) {
+                return true;
+            }
+            // TODO: 10/27/23 Log inconsistency, this should not happen
+        }
+
+        return false;
+    }
+
+    public void unlinkExistingLinks(Collection<PullRequestLink> links) {
+        links.forEach(linkerDao::removeByValue);
+    }
+
+    public boolean linksContainsHardLink(Set<PullRequestLink> existingLinks) {
+        return existingLinks.stream().anyMatch(PullRequestLink::hardLink);
+    }
+
+    public boolean isSameAuthor(PullRequest pullRequest, String requester) {
+        return pullRequest.getAuthorId().equals(requester);
+    }
+
+    public Set<PullRequestInfo> searchForOtherPullRequestsMentionedIn(String message, PullRequest pullRequest) {
+        return searchers.stream().map(searcher -> searcher.searchForLink(message))
+                .flatMap(Collection::stream)
+                .filter(found -> found.repository() != pullRequest.getInfo().repository())
+                .collect(Collectors.toSet());
+    }
+
+    public Set<PullRequestInfo> applyFiltersTo(Set<PullRequestInfo> infos, PullRequest pullRequest) {
+        return infos
+                .stream()
+                .map(pullRequestDao::get)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .filter(found -> filters.stream().filter(filter -> !filter.isApplicable(pullRequest, found))
+                        .findAny().isEmpty())
+                .map(PullRequest::getInfo)
+                .collect(Collectors.toSet());
+    }
+
+    public boolean moreThanOneRepositoryPerTypeIsPresent(Set<PullRequestInfo> infos) {
         class Holder {
             int amount = 0;
 
@@ -129,7 +155,7 @@ public class LinkService {
             }
         }
 
-        Map<Repository, Integer> result = links
+        Map<Repository, Integer> result = infos
                 .stream()
                 .map(PullRequestInfo::repository)
                 .collect(Collectors.groupingBy(Function.identity(), new Collector<Repository, Holder, Integer>() {
@@ -161,10 +187,10 @@ public class LinkService {
         for (Map.Entry<Repository, Integer> entry : result.entrySet()) {
             if (entry.getValue() > 1) {
                 // TODO: 10/16/23 Log this
-                return Collections.emptySet();
+                return false;
             }
         }
 
-        return links;
+        return true;
     }
 }
