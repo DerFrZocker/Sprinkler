@@ -106,7 +106,8 @@ public class LinkService {
             if (links.size() == 1) {
                 return true;
             }
-            // TODO: 10/27/23 Log inconsistency, this should not happen
+
+            throw new RuntimeException(String.format("The link %s is already saved, but the found links (%s) are more than 1, which should not happen and means there is an inconsistency in the save state of the dao (%s) which provides the links.", link, links, linkerDao));
         }
 
         return false;
