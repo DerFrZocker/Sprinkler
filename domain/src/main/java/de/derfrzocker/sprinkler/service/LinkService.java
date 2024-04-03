@@ -86,6 +86,7 @@ public class LinkService {
 
     private Set<PullRequestInfo> searchForLink(boolean specialLink, String requester, PullRequest pullRequest,
                                                String message) {
+        // If it is not a hard link, then only the author, which created the PR can modify it
         if (!specialLink && !pullRequest.getAuthorId().equals(requester)) {
             return Collections.emptySet();
         }
