@@ -19,6 +19,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -82,6 +83,7 @@ public class LinkService {
         }
 
         if (moreThanOneRepositoryPerTypeIsPresent(links)) {
+            Logger.getLogger(LinkService.class.getName()).info(String.format("The searchers and filters where not able to only find one link per repository for message '%s', manuel linking is required.", message));
             return Collections.emptySet();
         }
 
@@ -187,7 +189,6 @@ public class LinkService {
 
         for (Map.Entry<Repository, Integer> entry : result.entrySet()) {
             if (entry.getValue() > 1) {
-                // TODO: 10/16/23 Log this
                 return false;
             }
         }
