@@ -180,10 +180,10 @@ public class LinkService {
 
         for (Map.Entry<Repository, Integer> entry : result.entrySet()) {
             if (entry.getValue() > 1) {
-                return false;
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 }

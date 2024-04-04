@@ -1,6 +1,7 @@
 package de.derfrzocker.sprinkler.data;
 
 import java.time.Instant;
+import java.util.Objects;
 import java.util.Set;
 
 public class PullRequest implements Cloneable {
@@ -79,5 +80,18 @@ public class PullRequest implements Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new UnsupportedOperationException(e);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PullRequest that = (PullRequest) o;
+        return Objects.equals(getInfo(), that.getInfo()) && Objects.equals(getCreateDate(), that.getCreateDate()) && Objects.equals(getAuthorId(), that.getAuthorId()) && Objects.equals(getBranch(), that.getBranch()) && Objects.equals(getRev(), that.getRev()) && Objects.equals(getTitle(), that.getTitle()) && Objects.equals(getDescription(), that.getDescription()) && getStatus() == that.getStatus();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getInfo(), getCreateDate(), getAuthorId(), getBranch(), getRev(), getTitle(), getDescription(), getStatus());
     }
 }
