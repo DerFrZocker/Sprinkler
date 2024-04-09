@@ -2,34 +2,28 @@ package de.derfrzocker.sprinkler.event;
 
 import de.derfrzocker.sprinkler.event.handler.PullRequestEventHandler;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class PullRequestEventManager {
 
-    private final Map<Class<?>, PullRequestEventHandler<?>> eventHandlers = new HashMap<>();
+    private final Map<Class<?>, List<PullRequestEventHandler<?>>> eventHandlers = new HashMap<>();
 
     public <T extends PullRequestEvent> void registerEventHandler(PullRequestEventHandler<T> eventHandler) {
-        PullRequestEventHandler<?> other = eventHandlers.get(eventHandler.getEventType());
-
-        if (other != null) {
-            throw new IllegalArgumentException(
-                    String.format("Event handler for %s is already registered.", eventHandler.getEventType()));
-        }
-
-        eventHandlers.put(eventHandler.getEventType(), eventHandler);
+        eventHandlers.computeIfAbsent(eventHandler.getEventType(), t -> new ArrayList<>()).add(eventHandler);
     }
 
     public <T extends PullRequestEvent> void callEvent(T event) {
-        PullRequestEventHandler<?> eventHandler = eventHandlers.get(event.getClass());
+        List<PullRequestEventHandler<?>> handlers = eventHandlers.getOrDefault(event.getClass(),
+                Collections.emptyList());
 
-        if (eventHandler == null) {
-            throw new IllegalArgumentException(
-                    String.format("No event handler registered for even %s.", event.getClass()));
-        }
-
-        if (eventHandler.getEventType() == event.getClass()) {
-            ((PullRequestEventHandler<T>) eventHandler).handle(event);
+        for (PullRequestEventHandler<?> eventHandler : handlers) {
+            if (eventHandler.getEventType() == event.getClass()) {
+                ((PullRequestEventHandler<T>) eventHandler).handle(event);
+            }
         }
     }
 }
