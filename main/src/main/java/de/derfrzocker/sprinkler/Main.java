@@ -1,5 +1,6 @@
 package de.derfrzocker.sprinkler;
 
+import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpServer;
 import de.derfrzocker.sprinkler.dao.BitbucketCommitDao;
 import de.derfrzocker.sprinkler.dao.CommitDao;
@@ -30,22 +31,37 @@ import de.derfrzocker.sprinkler.webhook.request.handler.PullRequestModifiedReque
 import de.derfrzocker.sprinkler.webhook.request.handler.PullRequestOpenedRequestHandler;
 import de.derfrzocker.sprinkler.webhook.request.handler.PullRequestSourceBranchUpdatedRequestHandler;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.file.Files;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.Executors;
 
 public class Main {
 
+    private final static String PROPERTIES = "server.properties";
+    private final static File PROPERTIES_FILE = new File(PROPERTIES);
+
     public static void main(String[] args) throws IOException {
+        Properties properties = new Properties(System.getProperties());
+        if (!PROPERTIES_FILE.exists()) {
+            Files.copy(Main.class.getResourceAsStream(PROPERTIES), PROPERTIES_FILE.toPath());
+        }
+        properties.load(new FileInputStream(PROPERTIES_FILE));
+
         // Daos
-        PullRequestDao pullRequestDao = new MemoryPullRequestDao();
-        LinkerDao linkerDao = new MemoryLinkerDao();
-        RevDao revDao = new HttpRevDao();
-        CommitDao commitDao = new BitbucketCommitDao("dummy", "dummy"); // TODO 2024-02-14: Make configurateable
+        PullRequestDao pullRequestDao = loadPullRequestDao(properties);
+        LinkerDao linkerDao = loadLinkerDao(properties);
+        RevDao revDao = loadRevDao(properties);
+        CommitDao commitDao = loadCommitDao(properties);
 
         // Services
-        LinkService linkService = new LinkService(Collections.emptySet(), pullRequestDao, linkerDao);
+        LinkService linkService = new LinkService(loadSpecialLinker(properties), pullRequestDao, linkerDao);
         RevService revService = new RevService(revDao, commitDao);
 
         // Events
@@ -61,7 +77,7 @@ public class Main {
         manager.registerEventHandler(new PullRequestCommentAddedEventHandler(pullRequestDao, linkService));
 
         // Request handler
-        PullRequestWebhookHandler webhookHandler = new PullRequestWebhookHandler();
+        PullRequestWebhookHandler webhookHandler = new PullRequestWebhookHandler(properties.getProperty("sprinkler.webhook-token"), new Gson());
         webhookHandler.registerRequestHandler(new PullRequestSourceBranchUpdatedRequestHandler(manager));
         webhookHandler.registerRequestHandler(new PullRequestOpenedRequestHandler(manager));
         webhookHandler.registerRequestHandler(new PullRequestModifiedRequestHandler(manager));
@@ -71,12 +87,60 @@ public class Main {
         webhookHandler.registerRequestHandler(new PullRequestCommentAddedRequestHandler(manager));
 
         // Create Server
-        HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0); // TODO 2024-02-15: Make configuratable
+        HttpServer server = HttpServer.create(new InetSocketAddress(Integer.parseInt(properties.getProperty("sprinkler.webhook-port"))), 0);
         server.createContext("/api/v1/bitbucket-webhook/", webhookHandler);
         // Application is designed for single Thread only, but should be enough since at
         // best two or three PR will be modified in the same minute, with long pauses
         // between.
         server.setExecutor(Executors.newFixedThreadPool(1));
         server.start();
+    }
+
+    private static PullRequestDao loadPullRequestDao(Properties properties) {
+        return new MemoryPullRequestDao();
+    }
+
+    private static LinkerDao loadLinkerDao(Properties properties) {
+        return new MemoryLinkerDao();
+    }
+
+    private static RevDao loadRevDao(Properties properties) {
+        return new HttpRevDao();
+    }
+
+    private static CommitDao loadCommitDao(Properties properties) {
+        String username = properties.getProperty("sprinkler.bitbucket-username");
+        String token = properties.getProperty("sprinkler.bitbucket-token");
+
+        if (anyNullOrBlank(username, token)) {
+            return null;
+        }
+
+        return new BitbucketCommitDao(username, token);
+    }
+
+    private static Set<String> loadSpecialLinker(Properties properties) {
+        String names = properties.getProperty("sprinkler.special-linker");
+
+        if (anyNullOrBlank(names)) {
+            return Collections.emptySet();
+        }
+
+        Set<String> result = new HashSet<>();
+        for (String name : names.split(",")) {
+            result.add(name.trim());
+        }
+
+        return result;
+    }
+
+    private static boolean anyNullOrBlank(String... values) {
+        for (String value : values) {
+            if (value == null || value.isBlank()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
