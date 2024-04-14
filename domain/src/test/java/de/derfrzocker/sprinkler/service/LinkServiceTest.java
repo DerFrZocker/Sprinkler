@@ -58,7 +58,7 @@ public class LinkServiceTest {
         LinkService linkService = new LinkService(Collections.emptySet(), null, dao);
 
         PullRequestInfo infoOne = new PullRequestInfo(Repository.BUKKIT, 1);
-        PullRequestInfo infoTwo = new PullRequestInfo(Repository.CRAFT_BUKKIT, 2);
+        PullRequestInfo infoTwo = new PullRequestInfo(Repository.CRAFTBUKKIT, 2);
         PullRequestInfo infoThree = new PullRequestInfo(Repository.SPIGOT, 3);
         PullRequestInfo infoFour = new PullRequestInfo(Repository.BUKKIT, 4);
 

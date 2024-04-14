@@ -3,7 +3,7 @@ package de.derfrzocker.sprinkler.data;
 public enum Repository {
 
     BUKKIT("Bukkit"),
-    CRAFT_BUKKIT("CraftBukkit"),
+    CRAFTBUKKIT("CraftBukkit"),
     SPIGOT("Spigot");
 
     private final String fancyName;
