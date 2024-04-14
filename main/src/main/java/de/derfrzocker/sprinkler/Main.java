@@ -21,6 +21,11 @@ import de.derfrzocker.sprinkler.event.handler.PullRequestMergedEventHandler;
 import de.derfrzocker.sprinkler.event.handler.PullRequestSourceBranchChangedEventHandler;
 import de.derfrzocker.sprinkler.event.handler.PullRequestSourceBranchUptatedEventHandler;
 import de.derfrzocker.sprinkler.event.handler.PullRequestTitleUpdatedEventHandler;
+import de.derfrzocker.sprinkler.linker.filter.AuthorFilter;
+import de.derfrzocker.sprinkler.linker.filter.DateFilter;
+import de.derfrzocker.sprinkler.linker.filter.RevFilter;
+import de.derfrzocker.sprinkler.linker.searcher.DirectLinkRegexSearcher;
+import de.derfrzocker.sprinkler.linker.searcher.IndirectLinkRegexSearcher;
 import de.derfrzocker.sprinkler.service.LinkService;
 import de.derfrzocker.sprinkler.service.RevService;
 import de.derfrzocker.sprinkler.webhook.PullRequestWebhookHandler;
@@ -52,7 +57,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         Properties properties = new Properties(System.getProperties());
         if (!PROPERTIES_FILE.exists()) {
-            Files.copy(Main.class.getResourceAsStream(PROPERTIES), PROPERTIES_FILE.toPath());
+            Files.copy(Main.class.getResourceAsStream("/" + PROPERTIES), PROPERTIES_FILE.toPath());
         }
         properties.load(new FileInputStream(PROPERTIES_FILE));
 
