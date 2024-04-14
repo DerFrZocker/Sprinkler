@@ -12,7 +12,7 @@
 
     <modules>
         <module>bitbucket</module>
-        <module>database-memory</module>
+        <module>test-dao</module>
         <module>spigotmc-versions</module>
     </modules>
 

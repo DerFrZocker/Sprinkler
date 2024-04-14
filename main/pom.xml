@@ -69,7 +69,7 @@
         </dependency>
         <dependency>
             <groupId>de.derfrzocker</groupId>
-            <artifactId>sprinkler-plugin-database-memory</artifactId>
+            <artifactId>sprinkler-plugin-test-dao</artifactId>
             <version>1.0.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
