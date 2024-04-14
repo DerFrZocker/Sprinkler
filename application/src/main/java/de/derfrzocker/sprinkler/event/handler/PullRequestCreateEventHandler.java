@@ -40,6 +40,7 @@ public class PullRequestCreateEventHandler implements PullRequestEventHandler<Pu
         pullRequest.setStatus(Status.OPENED);
         pullRequest.setTitle(event.getTitle());
         pullRequest.setBranch(event.getBranch());
+        pullRequest.setDescription(event.getDescription());
 
         Set<Rev> revs;
         if ("master".equals(pullRequest.getBranch())) { // TODO 11/14/23 Make configurateable
