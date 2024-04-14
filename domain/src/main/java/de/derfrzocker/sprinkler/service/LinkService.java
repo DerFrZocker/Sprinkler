@@ -62,6 +62,10 @@ public class LinkService {
             return;
         }
 
+        if (mentionedPullRequests.isEmpty()) {
+            return;
+        }
+
         mentionedPullRequests.add(pullRequest.getInfo());
 
         Set<PullRequestLink> existingLinks = getExistingLinksFor(mentionedPullRequests);
