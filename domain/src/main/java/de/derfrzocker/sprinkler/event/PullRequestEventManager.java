@@ -16,6 +16,10 @@ public class PullRequestEventManager {
         eventHandlers.computeIfAbsent(eventHandler.getEventType(), t -> new ArrayList<>()).add(eventHandler);
     }
 
+    public <T extends PullRequestEvent> void unregisterEventHandler(PullRequestEventHandler<T> eventHandler) {
+        eventHandlers.getOrDefault(eventHandler.getEventType(), Collections.emptyList()).remove(eventHandler);
+    }
+
     public <T extends PullRequestEvent> void callEvent(T event) {
         List<PullRequestEventHandler<?>> handlers = eventHandlers.getOrDefault(event.getClass(),
                 Collections.emptyList());
