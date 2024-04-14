@@ -6,8 +6,11 @@ import de.derfrzocker.sprinkler.data.Commit;
 import de.derfrzocker.sprinkler.data.PullRequest;
 import de.derfrzocker.sprinkler.data.Rev;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -27,10 +30,17 @@ public class RevService {
 
         return commitStream
                 .map(Commit::hashes)
+                .map(this::reverse) // Reverse since the target repo commit hash is usually first
                 .flatMap(Collection::stream)
                 .map(hash -> revDao.get(pullRequest.getInfo().repository(), hash))
                 .filter(revs -> !revs.isEmpty())
                 .findFirst()
                 .orElse(new HashSet<>());
+    }
+
+    private List<String> reverse(List<String> list) {
+        List<String> reversed = new ArrayList<>(list);
+        Collections.reverse(reversed);
+        return reversed;
     }
 }
