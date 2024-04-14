@@ -94,4 +94,18 @@ public class PullRequest implements Cloneable {
     public int hashCode() {
         return Objects.hash(getInfo(), getCreateDate(), getAuthorId(), getBranch(), getRev(), getTitle(), getDescription(), getStatus());
     }
+
+    @Override
+    public String toString() {
+        return "PullRequest{" +
+                "info=" + info +
+                ", createDate=" + createDate +
+                ", authorId='" + authorId + '\'' +
+                ", branch='" + branch + '\'' +
+                ", rev=" + rev +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", status=" + status +
+                '}';
+    }
 }

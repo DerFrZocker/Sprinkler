@@ -113,10 +113,12 @@ public class Main {
     }
 
     private static PullRequestDao loadPullRequestDao(Properties properties) {
+        System.out.println("Using test MemoryPullRequestDao.");
         return new MemoryPullRequestDao();
     }
 
     private static LinkerDao loadLinkerDao(Properties properties) {
+        System.out.println("Using test MemoryLinkerDao.");
         return new MemoryLinkerDao();
     }
 
@@ -129,6 +131,7 @@ public class Main {
         String token = properties.getProperty("sprinkler.bitbucket-token");
 
         if (anyNullOrBlank(username, token)) {
+            System.out.println("No bitbucket username or token provided, using test FileCommitDao.");
             return new FileCommitDao(GSON, new File("test-data/commits/"));
         }
 

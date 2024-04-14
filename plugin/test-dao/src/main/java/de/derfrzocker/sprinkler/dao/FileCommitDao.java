@@ -22,6 +22,7 @@ public class FileCommitDao implements CommitDao {
 
     @Override
     public Stream<Commit> getCommits(PullRequestInfo pullRequestInfo) {
+        System.out.println("Getting commits for " + pullRequestInfo);
         try (FileReader fileReader = new FileReader(new File(directory, String.format("%s-%s.json", pullRequestInfo.repository().getFancyName(), pullRequestInfo.id())))) {
             List<Commit> commits = (List<Commit>) gson.fromJson(fileReader, TypeToken.getParameterized(List.class, Commit.class));
 
