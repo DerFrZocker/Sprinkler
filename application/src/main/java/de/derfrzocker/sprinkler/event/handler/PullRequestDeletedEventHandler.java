@@ -6,7 +6,6 @@ import de.derfrzocker.sprinkler.data.PullRequest;
 import de.derfrzocker.sprinkler.data.PullRequestInfo;
 import de.derfrzocker.sprinkler.data.PullRequestLink;
 import de.derfrzocker.sprinkler.event.PullRequestDeletedEvent;
-import de.derfrzocker.sprinkler.service.LinkService;
 
 public class PullRequestDeletedEventHandler extends BasePullRequestEventHandler<PullRequestDeletedEvent> {
 

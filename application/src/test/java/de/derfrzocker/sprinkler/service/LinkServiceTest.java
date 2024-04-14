@@ -1,24 +1,17 @@
 package de.derfrzocker.sprinkler.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 import de.derfrzocker.sprinkler.dao.LinkerDao;
 import de.derfrzocker.sprinkler.data.PullRequestInfo;
 import de.derfrzocker.sprinkler.data.PullRequestLink;
 import de.derfrzocker.sprinkler.data.Repository;
-import org.junit.jupiter.api.Test;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import org.junit.jupiter.api.Test;
 
 public class LinkServiceTest {
 
