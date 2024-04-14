@@ -48,7 +48,7 @@ public class LinkService {
     }
 
     public void searchAndCreateLink(String requester, PullRequest pullRequest, String message) {
-        if (!shouldHardLink(message, requester) && isSameAuthor(pullRequest, requester)) {
+        if (!shouldHardLink(message, requester) && !isSameAuthor(pullRequest, requester)) {
             return;
         }
         Set<PullRequestInfo> mentionedPullRequests = searchForOtherPullRequestsMentionedIn(message, pullRequest);
