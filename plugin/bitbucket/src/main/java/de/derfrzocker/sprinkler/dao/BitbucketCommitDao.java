@@ -22,10 +22,10 @@ public class BitbucketCommitDao implements CommitDao {
     private final HttpClient httpClient;
     private final Gson gson;
 
-    public BitbucketCommitDao(String username, String password) {
+    public BitbucketCommitDao(String username, String password, Gson gson) {
         this.authorization = new String(Base64.getEncoder().encode((username + ":" + password).getBytes(StandardCharsets.UTF_8)));
         this.httpClient = HttpClient.newHttpClient();
-        this.gson = new Gson();
+        this.gson = gson;
     }
 
     @Override

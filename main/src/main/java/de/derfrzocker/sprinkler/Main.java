@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpServer;
 import de.derfrzocker.sprinkler.dao.BitbucketCommitDao;
 import de.derfrzocker.sprinkler.dao.CommitDao;
+import de.derfrzocker.sprinkler.dao.FileCommitDao;
 import de.derfrzocker.sprinkler.dao.HttpRevDao;
 import de.derfrzocker.sprinkler.dao.LinkerDao;
 import de.derfrzocker.sprinkler.dao.MemoryLinkerDao;
@@ -44,6 +45,7 @@ import java.util.concurrent.Executors;
 
 public class Main {
 
+    private final static Gson GSON = new Gson();
     private final static String PROPERTIES = "server.properties";
     private final static File PROPERTIES_FILE = new File(PROPERTIES);
 
@@ -77,7 +79,7 @@ public class Main {
         manager.registerEventHandler(new PullRequestCommentAddedEventHandler(pullRequestDao, linkService));
 
         // Request handler
-        PullRequestWebhookHandler webhookHandler = new PullRequestWebhookHandler(properties.getProperty("sprinkler.webhook-token"), new Gson());
+        PullRequestWebhookHandler webhookHandler = new PullRequestWebhookHandler(properties.getProperty("sprinkler.webhook-token"), GSON);
         webhookHandler.registerRequestHandler(new PullRequestSourceBranchUpdatedRequestHandler(manager));
         webhookHandler.registerRequestHandler(new PullRequestOpenedRequestHandler(manager));
         webhookHandler.registerRequestHandler(new PullRequestModifiedRequestHandler(manager));
@@ -113,10 +115,10 @@ public class Main {
         String token = properties.getProperty("sprinkler.bitbucket-token");
 
         if (anyNullOrBlank(username, token)) {
-            return null;
+            return new FileCommitDao(GSON, new File("test-data/commits/"));
         }
 
-        return new BitbucketCommitDao(username, token);
+        return new BitbucketCommitDao(username, token, GSON);
     }
 
     private static Set<String> loadSpecialLinker(Properties properties) {
