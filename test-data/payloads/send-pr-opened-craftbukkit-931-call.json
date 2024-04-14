@@ -1,0 +1,213 @@
+{
+  "eventKey": "pr:opened",
+  "date": "2017-09-19T09:58:11+1000",
+  "actor": {
+    "name": "DerFrZocker",
+    "emailAddress": "<snip>",
+    "active": true,
+    "displayName": "<snip>",
+    "id": 25109,
+    "slug": "derfrzocker",
+    "type": "NORMAL",
+    "links": {
+      "self": [
+        {
+          "href": "https://hub.spigotmc.org/stash/users/derfrzocker"
+        }
+      ]
+    }
+  },
+  "pullRequest": {
+  "id": 931,
+  "version": 682,
+  "title": "Change Enums to classes to easier handle none standart minecraft values",
+  "description": "Bukkit PR: bukkit#660\n\nThe aim of this PR is to remove enums which have a corresponding minecraft register and replace them with abstract classes to better handle custom values which come from datapacks and create a base for potently allowing plugins to create there own values in the future.\n\n**Current PR State**\nWorking on it.\n\n**General Concept**\nThe general concept is to handle more over the registers by linking the bukkit register with a minecraft register and provide the values over the registers instead of the enum which is how its done currently. The classes than hold the default values as static final objects for backwards compatibility and easy access. The custom values can be accessed via the registry and are returned by the methods.\n\n**Advantages**\nThe key advantage is to better handle custom values such as custom biomes from datapacks. It also allows to better provide values without hardcoding them into the enum and opens the possibility to create an api which let plugins create there own values.\n\n**Estimated Maintenance Effort**\nOnce setup it should have around the same maintenance effort than the enum system. Meaning adding the missing default values to the corresponding class. The test cases where updated to make it easier to spot missing default values.\nIn some cases, where normally extra parameters are required, it can reduce maintenance effort, since they are than no longer needed and directly pulled from the minecraft object.\n\n**Backwards Contemptibility**\nWill most plugins will probably work with the changes, there are some instances where it can break them.\nManly when methods are used which are explicitly checking for an enum. This are for example EnumSet and EnumMap. However I would say that the average plugin developer don't use them / know that they exist and are using normal HashSet / HashMap instead. The more advanced developers which could use them usually also open source there plugins. So that in the case when the plugin is abandon that it can be easily be updated by another developer. Also I find the advantages and potential with the new system much greater then the small amount of plugins which will break because there are using EnumSet / EnumMap + being abandon and not open source.\nIf this however is a no-go, I am willing to look into asm / bite code manipulate to supported those plugins.\n\nPlugins which are using switches, comparisons (==), valueOf, values will work with those changes. For plugins the custom biomes will look / act like they are new biomes which minecraft can add in any new version. Therefore plugins should handle them accordingly (If they do not they will break any way in 1.18 when minecraft adds the new biomes).\n\nThere might be things witch I oversaw, every feedback / pair of eyes are welcome.\n\n**Discussion thread**\nNote there is also a discussion thread here https://www.spigotmc.org/threads/looking-for-testers-feedback-on-spigot-pull-request-converting-enums-to-classes.604316/",
+  "state": "OPEN",
+  "open": true,
+  "closed": false,
+  "draft": false,
+  "createdDate": 1631962345802,
+  "updatedDate": 1703853131622,
+  "fromRef": {
+    "id": "refs/heads/enums-to-registers",
+    "displayId": "enums-to-registers",
+    "latestCommit": "6a3d2ab236e809d23510ee065efc80a09498aa70",
+    "type": "BRANCH",
+    "repository": {
+      "slug": "craftbukkit",
+      "id": 1447,
+      "name": "CraftBukkit",
+      "hierarchyId": "bad9d648b93e6c4adced",
+      "scmId": "git",
+      "state": "AVAILABLE",
+      "statusMessage": "Available",
+      "forkable": true,
+      "origin": {
+        "slug": "craftbukkit",
+        "id": 12,
+        "name": "CraftBukkit",
+        "hierarchyId": "bad9d648b93e6c4adced",
+        "scmId": "git",
+        "state": "AVAILABLE",
+        "statusMessage": "Available",
+        "forkable": true,
+        "project": {
+          "key": "SPIGOT",
+          "id": 1,
+          "name": "Spigot",
+          "description": "Official repository of SpigotMC.",
+          "public": true,
+          "type": "NORMAL",
+          "links": {
+            "self": [
+              {
+                "href": "https://hub.spigotmc.org/stash/projects/SPIGOT"
+              }
+            ]
+          }
+        },
+        "public": false,
+        "archived": false,
+        "links": {
+          "clone": [
+            {
+              "href": "https://hub.spigotmc.org/stash/scm/spigot/craftbukkit.git",
+              "name": "http"
+            }
+          ],
+          "self": [
+            {
+              "href": "https://hub.spigotmc.org/stash/projects/SPIGOT/repos/craftbukkit/browse"
+            }
+          ]
+        }
+      },
+      "project": {
+        "key": "~DERFRZOCKER",
+        "id": 913,
+        "name": "<snip>",
+        "type": "PERSONAL",
+        "owner": {
+          "name": "DerFrZocker",
+          "emailAddress": "<snip>",
+          "active": true,
+          "displayName": "<snip>",
+          "id": 25109,
+          "slug": "derfrzocker",
+          "type": "NORMAL",
+          "links": {
+            "self": [
+              {
+                "href": "https://hub.spigotmc.org/stash/users/derfrzocker"
+              }
+            ]
+          }
+        },
+        "links": {
+          "self": [
+            {
+              "href": "https://hub.spigotmc.org/stash/users/derfrzocker"
+            }
+          ]
+        }
+      },
+      "public": true,
+      "archived": false,
+      "links": {
+        "clone": [
+          {
+            "href": "https://hub.spigotmc.org/stash/scm/~derfrzocker/craftbukkit.git",
+            "name": "http"
+          }
+        ],
+        "self": [
+          {
+            "href": "https://hub.spigotmc.org/stash/users/derfrzocker/repos/craftbukkit/browse"
+          }
+        ]
+      }
+    }
+  },
+  "toRef": {
+    "id": "refs/heads/master",
+    "displayId": "master",
+    "latestCommit": "e8f91497fa7f098aa90eb5eb6fe454557d6b3d4e",
+    "type": "BRANCH",
+    "repository": {
+      "slug": "craftbukkit",
+      "id": 12,
+      "name": "CraftBukkit",
+      "hierarchyId": "bad9d648b93e6c4adced",
+      "scmId": "git",
+      "state": "AVAILABLE",
+      "statusMessage": "Available",
+      "forkable": true,
+      "project": {
+        "key": "SPIGOT",
+        "id": 1,
+        "name": "Spigot",
+        "description": "Official repository of SpigotMC.",
+        "public": true,
+        "type": "NORMAL",
+        "links": {
+          "self": [
+            {
+              "href": "https://hub.spigotmc.org/stash/projects/SPIGOT"
+            }
+          ]
+        }
+      },
+      "public": false,
+      "archived": false,
+      "links": {
+        "clone": [
+          {
+            "href": "https://hub.spigotmc.org/stash/scm/spigot/craftbukkit.git",
+            "name": "http"
+          }
+        ],
+        "self": [
+          {
+            "href": "https://hub.spigotmc.org/stash/projects/SPIGOT/repos/craftbukkit/browse"
+          }
+        ]
+      }
+    }
+  },
+  "locked": false,
+  "author": {
+    "user": {
+      "name": "DerFrZocker",
+      "emailAddress": "<snip>",
+      "active": true,
+      "displayName": "<snip>",
+      "id": 25109,
+      "slug": "derfrzocker",
+      "type": "NORMAL",
+      "links": {
+        "self": [
+          {
+            "href": "https://hub.spigotmc.org/stash/users/derfrzocker"
+          }
+        ]
+      }
+    },
+    "role": "AUTHOR",
+    "approved": false,
+    "status": "UNAPPROVED"
+  },
+  "reviewers": [
+
+  ],
+  "participants": [
+
+  ],
+  "links": {
+    "self": [
+      {
+        "href": "https://hub.spigotmc.org/stash/projects/SPIGOT/repos/craftbukkit/pull-requests/931"
+      }
+    ]
+  }
+}
+}

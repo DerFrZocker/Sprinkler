@@ -1,0 +1,211 @@
+{
+  "eventKey": "pr:opened",
+  "date": "2017-09-19T09:58:11+1000",
+  "actor": {
+    "name": "DerFrZocker",
+    "emailAddress": "<snip>",
+    "active": true,
+    "displayName": "<snip>",
+    "id": 25109,
+    "slug": "derfrzocker",
+    "type": "NORMAL",
+    "links": {
+      "self": [
+        {
+          "href": "https://hub.spigotmc.org/stash/users/derfrzocker"
+        }
+      ]
+    }
+  },
+  "pullRequest": {
+    "id": 660,
+    "version": 407,
+    "title": "Change Enums to classes to easier handle none standart minecraft values",
+    "description": "CraftBukkit PR: craftbukkit#931\n\n**Discussion thread**\nNote there is also a discussion thread here https://www.spigotmc.org/threads/looking-for-testers-feedback-on-spigot-pull-request-converting-enums-to-classes.604316/",
+    "state": "OPEN",
+    "open": true,
+    "closed": false,
+    "draft": false,
+    "createdDate": 1631962417285,
+    "updatedDate": 1703853136314,
+    "fromRef": {
+      "id": "refs/heads/enums-to-registers",
+      "displayId": "enums-to-registers",
+      "latestCommit": "f4c02f459a5708cd3f63bdc82d1175beeffbfea2",
+      "type": "BRANCH",
+      "repository": {
+        "slug": "bukkit",
+        "id": 1448,
+        "name": "Bukkit",
+        "hierarchyId": "50af9cec6999af9795b5",
+        "scmId": "git",
+        "state": "AVAILABLE",
+        "statusMessage": "Available",
+        "forkable": true,
+        "origin": {
+          "slug": "bukkit",
+          "id": 11,
+          "name": "Bukkit",
+          "hierarchyId": "50af9cec6999af9795b5",
+          "scmId": "git",
+          "state": "AVAILABLE",
+          "statusMessage": "Available",
+          "forkable": true,
+          "project": {
+            "key": "SPIGOT",
+            "id": 1,
+            "name": "Spigot",
+            "description": "Official repository of SpigotMC.",
+            "public": true,
+            "type": "NORMAL",
+            "links": {
+              "self": [
+                {
+                  "href": "https://hub.spigotmc.org/stash/projects/SPIGOT"
+                }
+              ]
+            }
+          },
+          "public": false,
+          "archived": false,
+          "links": {
+            "clone": [
+              {
+                "href": "https://hub.spigotmc.org/stash/scm/spigot/bukkit.git",
+                "name": "http"
+              }
+            ],
+            "self": [
+              {
+                "href": "https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/browse"
+              }
+            ]
+          }
+        },
+        "project": {
+          "key": "~DERFRZOCKER",
+          "id": 913,
+          "name": "<snip>",
+          "type": "PERSONAL",
+          "owner": {
+            "name": "DerFrZocker",
+            "emailAddress": "<snip>",
+            "active": true,
+            "displayName": "<snip>",
+            "id": 25109,
+            "slug": "derfrzocker",
+            "type": "NORMAL",
+            "links": {
+              "self": [
+                {
+                  "href": "https://hub.spigotmc.org/stash/users/derfrzocker"
+                }
+              ]
+            }
+          },
+          "links": {
+            "self": [
+              {
+                "href": "https://hub.spigotmc.org/stash/users/derfrzocker"
+              }
+            ]
+          }
+        },
+        "public": true,
+        "archived": false,
+        "links": {
+          "clone": [
+            {
+              "href": "https://hub.spigotmc.org/stash/scm/~derfrzocker/bukkit.git",
+              "name": "http"
+            }
+          ],
+          "self": [
+            {
+              "href": "https://hub.spigotmc.org/stash/users/derfrzocker/repos/bukkit/browse"
+            }
+          ]
+        }
+      }
+    },
+    "toRef": {
+      "id": "refs/heads/master",
+      "displayId": "master",
+      "latestCommit": "507052e1128db859c297492d6467cfe06715a428",
+      "type": "BRANCH",
+      "repository": {
+        "slug": "bukkit",
+        "id": 11,
+        "name": "Bukkit",
+        "hierarchyId": "50af9cec6999af9795b5",
+        "scmId": "git",
+        "state": "AVAILABLE",
+        "statusMessage": "Available",
+        "forkable": true,
+        "project": {
+          "key": "SPIGOT",
+          "id": 1,
+          "name": "Spigot",
+          "description": "Official repository of SpigotMC.",
+          "public": true,
+          "type": "NORMAL",
+          "links": {
+            "self": [
+              {
+                "href": "https://hub.spigotmc.org/stash/projects/SPIGOT"
+              }
+            ]
+          }
+        },
+        "public": false,
+        "archived": false,
+        "links": {
+          "clone": [
+            {
+              "href": "https://hub.spigotmc.org/stash/scm/spigot/bukkit.git",
+              "name": "http"
+            }
+          ],
+          "self": [
+            {
+              "href": "https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/browse"
+            }
+          ]
+        }
+      }
+    },
+    "locked": false,
+    "author": {
+      "user": {
+        "name": "DerFrZocker",
+        "emailAddress": "<snip>",
+        "active": true,
+        "displayName": "<snip>",
+        "id": 25109,
+        "slug": "derfrzocker",
+        "type": "NORMAL",
+        "links": {
+          "self": [
+            {
+              "href": "https://hub.spigotmc.org/stash/users/derfrzocker"
+            }
+          ]
+        }
+      },
+      "role": "AUTHOR",
+      "approved": false,
+      "status": "UNAPPROVED"
+    },
+    "reviewers": [
+    ],
+    "participants": [
+    ],
+    "links": {
+      "self": [
+        {
+          "href": "https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/pull-requests/660"
+        }
+      ]
+    }
+  }
+}
