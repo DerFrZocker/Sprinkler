@@ -71,6 +71,15 @@ public class Main {
         LinkService linkService = new LinkService(loadSpecialLinker(properties), pullRequestDao, linkerDao);
         RevService revService = new RevService(revDao, commitDao);
 
+        // Register link service filter
+        linkService.registerFilter(new AuthorFilter());
+        linkService.registerFilter(new DateFilter());
+        linkService.registerFilter(new RevFilter());
+
+        // Register link service searcher
+        linkService.registerSearchers(new DirectLinkRegexSearcher());
+        linkService.registerSearchers(new IndirectLinkRegexSearcher());
+
         // Events
         PullRequestEventManager manager = new PullRequestEventManager();
         manager.registerEventHandler(new PullRequestTitleUpdatedEventHandler(pullRequestDao));
