@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 public class DirectLinkRegexSearcher implements Searcher {
 
     private static final Pattern PATTERN = Pattern.compile(
-            "https?://hub.spigotmc.org/stash/projects/SPIGOT/repos/(craftbukkit|spigot|bukkit)/pull-requests/*d");
+            "https?://hub.spigotmc.org/stash/projects/SPIGOT/repos/(craftbukkit|spigot|bukkit)/pull-requests/\\d*");
 
     @Override
     public Set<PullRequestInfo> searchForLink(String message) {

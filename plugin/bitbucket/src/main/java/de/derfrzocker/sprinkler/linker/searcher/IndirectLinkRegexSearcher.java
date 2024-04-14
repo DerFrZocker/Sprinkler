@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 public class IndirectLinkRegexSearcher implements Searcher {
 
-    private static final Pattern PATTERN = Pattern.compile("(craftbukkit|spigot|bukkit):*d");
+    private static final Pattern PATTERN = Pattern.compile("(craftbukkit|spigot|bukkit)#\\d*");
 
     @Override
     public Set<PullRequestInfo> searchForLink(String message) {
@@ -20,7 +20,7 @@ public class IndirectLinkRegexSearcher implements Searcher {
 
         while (matcher.find()) {
             String result = message.substring(matcher.start(), matcher.end());
-            int first = result.indexOf(':');
+            int first = result.indexOf('#');
             String repo = result.substring(0, first);
             String prId = result.substring(first + 1);
 
