@@ -25,7 +25,7 @@ public class PullRequestOpenedRequestHandler implements RequestHandler<BasicPull
         String title = resource.pullRequest().title();
         String description = resource.pullRequest().description();
         String branch = resource.pullRequest().toRef().displayId();
-        Instant creationTime = resource.pullRequest().createdData();
+        Instant creationTime = Instant.ofEpochMilli(resource.pullRequest().createdDate());
         PullRequestCreateEvent event = new PullRequestCreateEvent(repository, pullRequestId, actorId, title,
                 description, branch, creationTime);
 
