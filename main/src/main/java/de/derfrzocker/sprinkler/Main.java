@@ -19,7 +19,7 @@ import de.derfrzocker.sprinkler.event.handler.PullRequestDeletedEventHandler;
 import de.derfrzocker.sprinkler.event.handler.PullRequestDescriptionUpdatedEventHandler;
 import de.derfrzocker.sprinkler.event.handler.PullRequestMergedEventHandler;
 import de.derfrzocker.sprinkler.event.handler.PullRequestSourceBranchChangedEventHandler;
-import de.derfrzocker.sprinkler.event.handler.PullRequestSourceBranchUptatedEventHandler;
+import de.derfrzocker.sprinkler.event.handler.PullRequestSourceBranchUpdatedEventHandler;
 import de.derfrzocker.sprinkler.event.handler.PullRequestTitleUpdatedEventHandler;
 import de.derfrzocker.sprinkler.linker.filter.AuthorFilter;
 import de.derfrzocker.sprinkler.linker.filter.DateFilter;
@@ -83,7 +83,7 @@ public class Main {
         // Events
         PullRequestEventManager manager = new PullRequestEventManager();
         manager.registerEventHandler(new PullRequestTitleUpdatedEventHandler(pullRequestDao));
-        manager.registerEventHandler(new PullRequestSourceBranchUptatedEventHandler(pullRequestDao, revService));
+        manager.registerEventHandler(new PullRequestSourceBranchUpdatedEventHandler(pullRequestDao, revService));
         manager.registerEventHandler(new PullRequestSourceBranchChangedEventHandler(pullRequestDao, revService));
         manager.registerEventHandler(new PullRequestMergedEventHandler(pullRequestDao));
         manager.registerEventHandler(new PullRequestDescriptionUpdatedEventHandler(pullRequestDao, linkService));

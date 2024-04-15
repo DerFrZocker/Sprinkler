@@ -8,13 +8,13 @@ import de.derfrzocker.sprinkler.service.RevService;
 
 import java.util.Set;
 
-public class PullRequestSourceBranchUptatedEventHandler
+public class PullRequestSourceBranchUpdatedEventHandler
         extends BasePullRequestEventHandler<PullRequestSourceBranchUpdatedEvent> {
 
     private final PullRequestDao requestDao;
     private final RevService revService;
 
-    public PullRequestSourceBranchUptatedEventHandler(PullRequestDao requestDao, RevService revService) {
+    public PullRequestSourceBranchUpdatedEventHandler(PullRequestDao requestDao, RevService revService) {
         super(requestDao);
         this.requestDao = requestDao;
         this.revService = revService;
