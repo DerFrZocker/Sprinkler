@@ -1,7 +1,7 @@
 package de.derfrzocker.sprinkler.webhook.request.handler;
 
 import de.derfrzocker.sprinkler.data.Repository;
-import de.derfrzocker.sprinkler.event.PullRequestDescriptionUptatedEvent;
+import de.derfrzocker.sprinkler.event.PullRequestDescriptionUpdatedEvent;
 import de.derfrzocker.sprinkler.event.PullRequestEventManager;
 import de.derfrzocker.sprinkler.event.PullRequestSourceBranchChangedEvent;
 import de.derfrzocker.sprinkler.event.PullRequestTitleUpdatedEvent;
@@ -28,7 +28,7 @@ public class PullRequestModifiedRequestHandler implements RequestHandler<BasicPu
         String branch = resource.pullRequest().toRef().displayId();
         PullRequestTitleUpdatedEvent titleEvent = new PullRequestTitleUpdatedEvent(repository,
                 pullRequestId, actorId, title);
-        PullRequestDescriptionUptatedEvent descriptionEvent = new PullRequestDescriptionUptatedEvent(repository,
+        PullRequestDescriptionUpdatedEvent descriptionEvent = new PullRequestDescriptionUpdatedEvent(repository,
                 pullRequestId, actorId, description);
         PullRequestSourceBranchChangedEvent branchEvent = new PullRequestSourceBranchChangedEvent(repository,
                 pullRequestId, actorId, branch);

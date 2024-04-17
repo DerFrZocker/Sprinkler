@@ -2,13 +2,13 @@ package de.derfrzocker.sprinkler.event.handler;
 
 import de.derfrzocker.sprinkler.dao.PullRequestDao;
 import de.derfrzocker.sprinkler.data.PullRequest;
-import de.derfrzocker.sprinkler.event.PullRequestDescriptionUptatedEvent;
+import de.derfrzocker.sprinkler.event.PullRequestDescriptionUpdatedEvent;
 import de.derfrzocker.sprinkler.service.LinkService;
 
 import java.util.Objects;
 
 public class PullRequestDescriptionUpdatedEventHandler
-        extends BasePullRequestEventHandler<PullRequestDescriptionUptatedEvent> {
+        extends BasePullRequestEventHandler<PullRequestDescriptionUpdatedEvent> {
 
     private final PullRequestDao requestDao;
     private final LinkService linkService;
@@ -20,7 +20,7 @@ public class PullRequestDescriptionUpdatedEventHandler
     }
 
     @Override
-    public void handle(PullRequest pullRequest, PullRequestDescriptionUptatedEvent event) {
+    public void handle(PullRequest pullRequest, PullRequestDescriptionUpdatedEvent event) {
         if (Objects.equals(pullRequest.getDescription(), event.getDescription())) {
             // Descriptions are the same no need to update something
             return;
@@ -32,7 +32,7 @@ public class PullRequestDescriptionUpdatedEventHandler
     }
 
     @Override
-    public Class<PullRequestDescriptionUptatedEvent> getEventType() {
-        return PullRequestDescriptionUptatedEvent.class;
+    public Class<PullRequestDescriptionUpdatedEvent> getEventType() {
+        return PullRequestDescriptionUpdatedEvent.class;
     }
 }
